@@ -9,6 +9,9 @@ public:
   double p_error;
   double i_error;
   double d_error;
+  double best_error;
+  double total_error;
+  const double tol;
 
   /*
   * Coefficients
