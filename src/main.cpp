@@ -30,7 +30,8 @@ std::string hasData(std::string s) {
 
 int main(int argc, char const **argv)
 {
-  int const default_argc = 5;
+  // Set up default input parameters
+  int const default_argc = 4;
   char const *default_args[] = {"./pid", "-0.1", "-0.000001", "-2.5"};
   if (argc == 1)   // no arguments were passed
     {
@@ -69,13 +70,14 @@ int main(int argc, char const **argv)
           //double angle = std::stod(j[1]["steering_angle"].get<std::string>());
           double steer_value;
           /*
-          * TODOING: Calcuate steering value here, remember the steering value is
+          * TO_DID: Calcuate steering value here, remember the steering value is
           * [-1, 1].
           * NOTE: Feel free to play around with the throttle and speed. Maybe use
           * another PID controller to control the speed!
           */
           pid.UpdateError(cte);
           steer_value = pid.TotalError();
+          pid.Twiddle(cte);
           
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
