@@ -10,8 +10,7 @@ public:
   double i_error;
   double d_error;
   double best_error;
-  double total_error;
-  const double tol;
+  double tol;
 
   /*
   * Coefficients
