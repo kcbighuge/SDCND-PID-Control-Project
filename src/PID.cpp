@@ -1,6 +1,7 @@
 #include "PID.h"
+#include <math.h>
 #include <iostream>
-#include <array>
+#define MIN_STEPS 100
 
 using namespace std;
 
@@ -12,76 +13,112 @@ PID::PID() {}
 
 PID::~PID() {}
 
-void PID::Init(double Kp, double Ki, double Kd) {
-	this->Kp = Kp;
-	this->Ki = Ki;
-	this->Kd = Kd;
+void PID::Init(double Kp_, double Ki_, double Kd_) {
+	Kp = Kp_;
+	Ki = Ki_;
+	Kd = Kd_;
 
 	p_error = 0;
   i_error = 0;
   d_error = 0;
-	tol = 0.2;
+
+  dpp = Kp/4;
+  dpi = Ki/4;
+  dpd = Kd/4;
 }
 
 void PID::UpdateError(double cte) {
 	d_error = cte - p_error;
 	p_error = cte;
 	i_error += cte;
+
+	if(num_steps>MIN_STEPS) total_error += pow(cte,2);
+	num_steps++;
 }
 
 double PID::TotalError() {
-	return Kp*p_error + Ki*i_error + Kd*d_error;
+	return -Kp*p_error -Ki*i_error -Kd*d_error;
 }
 
-void PID::Twiddle(double cte) {
-	array<double, 3> p = {Kp, Ki, Kd};
-	array<double, 3> dp = {1, 1, 1};
+void PID::Twiddle() {
+	// see: https://github.com/jendrikjoe/UdacityProjects
 
-	for (int i=0; i<p.size(); ++i) {
-		cout << "p is: " << i << " - " << p[i] << endl;
+	double err = total_error / (num_steps - MIN_STEPS);
+	int numSteps = num_steps;
 
-		while ((dp[0]+dp[1]+dp[2]) < tol) {
-			p[i] += dp[i];
-			cout << "p is now: " << i << " - " << p[i] << endl;
-			cout << "Kp is now: " << Kp << endl;
-		}
+	total_error = 0;
+	num_steps = 0;
 	
+	if(best_error > 1e8) {
+		best_error = err;
+		cout << "New best Kp: " << Kp 
+					<< " Kd: " << Kd
+					<< " Ki: " << Ki << " Error: " << best_error
+					<< " Sum dpi: " << dpp + dpi + dpd 
+					<< endl;
+		Kp += dpp;
+		return;
+	}
+
+	i_error = 0;
+	d_error = 0;
+	p_error = 0;
+	
+	if (err < best_error && numSteps > 300) {
+
+		best_error = err;
+		dpp *= 1.1;
+		
+		if(switcher == 0) dpp *= 1.1;
+		//else if(switchTweeker == 1) dpi *= 1.1;
+		else dpd *= 1.1;
+		switcher = (switcher+1) % 2;
+		up = true;
+		
+		cout << "New best Kp: " << Kp 
+					//<< " Kd: " << Kd << " Ki: " << Ki 
+					<< " Error: " << best_error
+					<< " Sum dp: " << dpp + dpi + dpd 
+					<< endl;
+
+	} else {
+		
+		std::cout << "Skipped Kp: " << Kp << " Kd: " << Kd
+								<< " Ki: " << Ki << " Error: " << err
+								<< " Sum dpi: " << dpp + dpi + dpd << std::endl;
+		if(up == true) {
+			up = false;
+		} else {
+			if (switcher == 0) {
+				Kp += dpp;
+				dpp *= 0.9;
+			}
+			/*else if (switcher == 1) {
+				Ki += dpi;
+				dpi *= .9;
+			}*/
+			else {
+				Kd += dpd;
+				dpd *= .9;
+			}
+			switcher = (switcher + 1) % 2;
+			up = true;
+			
+		}
+
+	}
+
+	if(switcher == 0) {
+		if(up) Kp += dpp;
+		else Kp-= 2*dpp;
+	}
+	/*if(switcher == 1) {
+		if(up) Ki += dpi;
+		else Ki -= 2*dpi;
+	}*/
+	if(switcher == 1) {
+		if(up) Kd += dpd;
+		else Kd-= 2*dpd;
 	}
 
 }
-
-/*
-def twiddle(tol=0.2):
-
-    # Don't forget to call `make_robot` before you call `run`!
-    p = [0, 0, 0]
-    dp = [1, 1, 1]
-    robot = make_robot()
-    x_trajectory, y_trajectory, best_err = run(robot, p)
-    # TODO: twiddle loop here
-    while sum(dp) > tol:
-        print(sum(dp))
-        for i in range(len(p)):
-            p[i] += dp[i]
-
-            robot = make_robot()
-            _,_,err = run(robot, p)
-
-            if err < best_err:
-                best_err = err
-                dp[i] *= 1.1
-
-            else:
-                p[i] -= 2*dp[i]
-                robot = make_robot()
-                _,_,err = run(robot, p)
-
-                if err < best_err:
-                    best_err = err
-                    dp[i] *= 1.1
-                else:
-                    p[i] += dp[i]
-                    dp[i] *= 0.9
-
-    return p, best_err
-*/

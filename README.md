@@ -45,10 +45,19 @@ There's an experimental patch for windows in this [PR](https://github.com/udacit
 ### Choosing the final hyperparameters (P, I, D coefficients). 
 
 #### 1.) Manual tuning  
-The first approach to choosing the hyperparameters was a manual search using different values experimentaly.
+The first approach to choosing the hyperparameters was a manual search using different values experimentaly. [This post](https://robotics.stackexchange.com/questions/167/what-are-good-strategies-for-tuning-pid-loops) was also used to generate ideas for tuning the coefficients. Ultimately the following values were used:
+```
+P = -0.1
+I = -0.000001
+D = -2.5
+```
+
+See video here:  
+[![PID Control](http://img.youtube.com/vi/innwrbbnDlw/0.jpg)](http://www.youtube.com/watch?v=innwrbbnDlw "PID Control")
+
 
 #### 2.) Twiddle  
-After manual tuning proved to be ineffective, the coefficients were optimized with Twiddle (coordinate ascent). 
+After manual tuning, I attempted to optimize the coefficients with Twiddle (coordinate ascent). The implementation stores the cte for a certain number of iterations (e.g., the last 32 cte's) and runs the Twiddle algorithm to reset the P,I,D values.
 
 
 ---
