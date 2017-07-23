@@ -39,7 +39,7 @@ There's an experimental patch for windows in this [PR](https://github.com/udacit
 ## Reflection
 
 ### The effects of the P, I, D components  
-- __P (Proportional control)__: The magnitude of this value largely determines the steering, as it is generated directly from the cross track error (cte). After starting with a values of `0.5`, I found that a lower magnitude helped smooth the car's steering and reduce oscillations.
+- __P (Proportional control)__: The magnitude of this value largely determines the steering, as it is generated directly from the cross track error (cte). After starting with a value of `0.5`, I found that a lower magnitude helped smooth the car's steering and reduce oscillations.
 - __I (Integral)__: I was expecting to keep this value small to lessen the impact of the growing integral value. It turned out that just keeping this value near `0` was the best approach.
 - __D (Derivative)__: I expected to use a smaller magnitude value here than the P component, but found that I actually needed to *increase* it to smooth the steering. It seems that this value needs to be at least 1 order of magnitude greater than the P value.
 
@@ -55,11 +55,11 @@ D = 2.8
 
 See video here:  
 
-[![PID Control](http://img.youtube.com/vi/innwrbbnDlw/0.jpg)](http://www.youtube.com/watch?v=innwrbbnDlw "PID Control"){:target="_blank"}
+[![PID Control](http://img.youtube.com/vi/innwrbbnDlw/0.jpg)](http://www.youtube.com/watch?v=innwrbbnDlw "PID Control")
 
 
 #### 2.) Twiddle  
-The next approach was to optimize the P,I,D coefficients with Twiddle (coordinate ascent). The implementation was inspired largely by [this project](https://github.com/jendrikjoe/UdacityProjects), and you can toggle the use of Twiddle using the `useTwiddle` parameter in the `PID.h` file.
+The next approach was to optimize the P,I,D coefficients with Twiddle (coordinate ascent). The implementation was inspired largely by [this project](https://github.com/jendrikjoe/UdacityProjects/blob/master/PID-Control-Project/src/PID.cpp#L35-L96), and you can toggle the use of Twiddle using the `useTwiddle` parameter in the `PID.h` file.
 
 After some experimentation with different twiddle parameter values without much success, I settled on using the manually tuned P,I,D values with `useTwiddle = false` as the default setting for the project.
 
