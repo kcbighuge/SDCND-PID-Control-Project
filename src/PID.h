@@ -31,6 +31,8 @@ public:
   bool up = true;
   int switcher = 0;
   bool useTwiddle = false;
+  const int stepsTwiddle = 60;
+  const double dp_diff = 0.1;
   const double accel = 0.6;
 
   /*

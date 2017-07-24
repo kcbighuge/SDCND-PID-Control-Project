@@ -46,7 +46,7 @@ There's an experimental patch for windows in this [PR](https://github.com/udacit
 ### Choosing the final hyperparameters (P, I, D coefficients). 
 
 #### 1.) Manual tuning  
-The initial approach to choosing hyperparameters was a manual search using different values experimentaly. [This post](https://robotics.stackexchange.com/questions/167/what-are-good-strategies-for-tuning-pid-loops) was also used to generate ideas for tuning the coefficients. Ultimately the following values were used, with the vehicle throttle increase to `0.6`...
+The initial approach to choosing hyperparameters was a manual search using different values experimentaly. [This post](https://robotics.stackexchange.com/questions/167/what-are-good-strategies-for-tuning-pid-loops) was also used to generate ideas for tuning the coefficients. The first working solution used the following values, with the vehicle throttle increase to `0.6`...
 ```
 P = 0.1
 I = 0.000001
@@ -62,7 +62,6 @@ See video here:
 The next approach was to optimize the P,I,D coefficients with Twiddle (coordinate ascent). The implementation was inspired largely by [this project](https://github.com/jendrikjoe/UdacityProjects/blob/master/PID-Control-Project/src/PID.cpp#L35-L96), and you can toggle the use of Twiddle using the `useTwiddle` parameter in the `PID.h` file.
 
 After some experimentation with different twiddle parameter values without much success, I settled on using the manually tuned P,I,D values with `useTwiddle = false` as the default setting for the project.
-
 
 
 #### Additional resources:  
